@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:4321/stressless-website/ . `npm run build` generates the static site in `dist/`; `npm run preview` previews that build.
+Open http://localhost:4321/stressless-gentle-grasp/ . `npm run build` generates the static site in `dist/`; `npm run preview` previews that build.
 
 ## Content
 
@@ -29,16 +29,16 @@ The training-set figure contains the author's existing “TOFU MISSING” annota
 
 ## GitHub Pages
 
-Intended repository: `yifeidong0/stressless-website`.
+Repository: `yifeidong0/stressless-gentle-grasp`.
 
-The base path in `astro.config.mjs` is `/stressless-website`. The included workflow builds and deploys pushes to `main`. In GitHub repository settings, set Pages source to **GitHub Actions**.
+The base path in `astro.config.mjs` is `/stressless-gentle-grasp`. The included workflow builds and deploys pushes to `main`. In GitHub repository settings, set Pages source to **GitHub Actions**.
 
 To create the remote once authenticated:
 
 ```sh
 gh auth login
-gh repo create yifeidong0/stressless-website --public --source=. --remote=origin --push
-gh api --method POST repos/yifeidong0/stressless-website/pages -f build_type=workflow
+gh repo create yifeidong0/stressless-gentle-grasp --public --source=. --remote=origin --push
+gh api --method POST repos/yifeidong0/stressless-gentle-grasp/pages -f build_type=workflow
 ```
 
 Change `--public` to `--private` if keeping the submission private (Pages availability depends on the account plan). Do not create a duplicate remote if it already exists.
