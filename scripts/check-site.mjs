@@ -1,0 +1,30 @@
+import { chromium } from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser = await chromium.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox']});
+const page = await browser.newPage({viewport:{width:1440,height:1000}});
+const errors=[];
+page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://localhost:4321/stressless-website/',{waitUntil:'networkidle'});
+await page.locator('img').evaluateAll(async images=>{ await Promise.all(images.map(img=>{img.loading='eager';return img.decode().catch(()=>{});})); });
+await page.screenshot({path:'/tmp/stressless-desktop.png',fullPage:true});
+assert.equal(await page.locator('h1').count(),1);
+assert.equal(await page.locator('.figure-grid figure').count(),4);
+assert.equal(await page.locator('.bar-row').count(),5);
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+for (const url of await page.locator('a[href],img[src],video source[src]').evaluateAll(els=>els.map(e=>e.getAttribute('href')||e.getAttribute('src')).filter(x=>x?.startsWith('/stressless-website/')))) {
+ const response=await page.request.get(new URL(url,'http://localhost:4321').href); assert.equal(response.status(),200,url);
+}
+await page.locator('#full-video').click();
+assert.match(await page.locator('video').getAttribute('src'),/full/);
+await page.locator('#full-video').click();
+assert.match(await page.locator('video').getAttribute('src'),/highlight/);
+await page.locator('summary').click();
+assert.equal(await page.locator('details').getAttribute('open'),'');
+await page.setViewportSize({width:390,height:844});
+await page.goto('http://localhost:4321/stressless-website/',{waitUntil:'networkidle'});
+await page.locator('img').evaluateAll(async images=>{ await Promise.all(images.map(img=>{img.loading='eager';return img.decode().catch(()=>{});})); });
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+await page.screenshot({path:'/tmp/stressless-mobile.png',fullPage:true});
+assert.deepEqual(errors,[]);
+await browser.close();
+console.log('PASS: desktop/mobile layout, all local assets, video switch, figure disclosure, and browser errors.');

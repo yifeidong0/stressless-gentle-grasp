@@ -1,0 +1,48 @@
+---
+import '../styles/site.css';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const asset = (path: string) => `${base}/assets/${path}`;
+const figures = [
+ {file:'stress.png', label:'Stress, before contact.', text:'Finite-element simulation compares the internal stress induced by candidate grasps.', tag:'01 / PHYSICS'},
+ {file:'training.png', label:'Variation is the training signal.', text:'Real demonstration objects used to train the comparison baselines.', tag:'02 / BASELINE DATA'},
+ {file:'evaluation.png', label:'Eleven categories. Real fragility.', text:'Evaluation spans food, a beverage can, and a paper cup.', tag:'03 / EVALUATION'},
+ {file:'setup.png', label:'A simple real-world setup.', text:'A robot arm, parallel-jaw gripper, and one external depth camera.', tag:'04 / HARDWARE'},
+];
+const results = [{name:'StressLess',lift:.66,safe:.78,score:.72},{name:'RGB DP · scratch',lift:.57,safe:.67,score:.62},{name:'RGB DP · finetune',lift:.46,safe:.67,score:.56},{name:'Point-cloud DP',lift:.43,safe:.67,score:.55},{name:'RGB DP · frozen',lift:.18,safe:.53,score:.36}];
+---
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>StressLess — Learning a gentler grasp</title>
+  <meta name="description" content="StressLess learns fragile-object grasping from stress-aware demonstrations in simulation. A research project on generalizable gentle manipulation."/>
+  <meta property="og:title" content="StressLess — Learning a gentler grasp"/><meta property="og:description" content="Stress-aware simulation. Gentle real-world grasping."/><meta property="og:type" content="website"/><meta property="og:image" content={`https://yifeidong0.github.io${asset('video/poster.jpg')}`}/>
+  <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`}/>
+ </head>
+ <body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="nav wrap"><a class="wordmark" href="#">StressLess<span class="brand-dot"></span></a><nav aria-label="Main navigation"><a href="#method">Method</a><a href="#results">Results</a><a class="nav-paper" href={asset('paper/stressless.pdf')}>Paper <span aria-hidden="true">↗</span></a></nav></header>
+  <main id="main">
+   <section class="hero wrap">
+    <div class="hero-copy"><p class="eyebrow"><span></span> ROBOT LEARNING / ICRA SUBMISSION</p><h1>A gentler grasp.<br/><em>Learned in simulation.</em></h1><p class="paper-title">StressLess: Towards Generalizable Fragile Food Grasping from Stress-Aware Demonstrations at Scale</p>
+     <div class="takeaway"><span>TL;DR</span><p>Teach a robot <strong>where to grasp and how far to close</strong> using simulated stress—then bring that gentleness into the real world.</p></div>
+     <div class="hero-links"><a class="button" href={asset('paper/stressless.pdf')}>Read the manuscript <span aria-hidden="true">↗</span></a><a class="text-link" href="#method">Explore the method <span aria-hidden="true">↓</span></a></div>
+    </div>
+    <figure class="hero-video"><div class="video-top"><span class="live-dot"></span> REAL ROBOT · REAL-TIME EXCERPTS <span class="video-time">00:32</span></div><video id="hero-video" controls muted loop playsinline preload="metadata" poster={asset('video/poster.jpg')} aria-label="StressLess real-world grasping highlight reel"><source src={asset('video/gentle-grasp-highlight.mp4')} type="video/mp4"/>Your browser does not support embedded video. <a href={asset('video/gentle-grasp-highlight.mp4')}>Download the highlight.</a></video><figcaption><span>Small forces. Delicate objects.</span><button id="full-video" type="button" data-full={asset('video/gentle-grasp-full.mp4')} data-short={asset('video/gentle-grasp-highlight.mp4')}>Watch full video <span aria-hidden="true">↗</span></button></figcaption></figure>
+   </section>
+   <section class="authors wrap" aria-label="Authors"><p>Kei Ikemura<sup>1,*</sup> <span>·</span> Yifei Dong<sup>1,*</sup> <span>·</span> David Blanco-Mulero<sup>2</sup> <span>·</span> Alberta Longhini<sup>3</sup><br/>Carme Torras<sup>2</sup> <span>·</span> Júlia Borràs<sup>2</sup> <span>·</span> Florian T. Pokorny<sup>1</sup></p><p class="affiliations">¹ KTH Royal Institute of Technology &nbsp; ² IRI, CSIC–UPC &nbsp; ³ Stanford University <span>* Equal contribution</span></p></section>
+   <section class="method wrap section" id="method"><div class="section-heading"><div><p class="eyebrow">THE IDEA</p><h2>Gentleness starts<br/>before the grasp.</h2></div><p>Plan with internal stress. Learn from diverse demonstrations. Act from a point cloud.</p></div><a class="figure-link pipeline" href={asset('figures/method.drawio.png')} aria-label="Open full-resolution method pipeline"><img src={asset('figures/method.drawio.png')} alt="Pipeline from stress-aware simulated grasp demonstrations, through point-cloud policy learning, to real robot deployment" width="2048" height="542" loading="eager"/></a><div class="steps"><div><span>01</span><h3>Plan gently</h3><p>Select a grasp pose and closing width that limit stress while resisting gravity.</p></div><div><span>02</span><h3>Learn broadly</h3><p>Train one diffusion policy on randomized shapes, poses, sizes, and materials.</p></div><div><span>03</span><h3>Transfer to reality</h3><p>Use point-cloud observations to grasp fragile objects with a parallel-jaw gripper.</p></div></div></section>
+   <section class="results-section" id="results"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">REAL-WORLD RESULTS</p><h2>A better balance.<br/><em>Lift and keep intact.</em></h2></div><p>Averaged across 11 categories and two evaluators. S-Lift combines Lift and Safe with equal weight.</p></div><div class="results-grid"><div class="scorecards"><div><strong>0.66</strong><span>Lift</span></div><div><strong>0.78</strong><span>Safe</span></div><div><strong>0.72</strong><span>S-Lift</span></div><p>StressLess · category-averaged scores, on a 0–1 scale.</p></div><div class="chart" aria-label="S-Lift comparison"><p class="chart-label">MEAN S-LIFT <span>0 → 1</span></p>{results.map((r,i)=><div class:list={['bar-row',{'ours':i===0}]}><div class="bar-label"><span>{r.name}</span><strong>{r.score.toFixed(2)}</strong></div><div class="track"><span style={`width:${r.score*100}%`}></span></div></div>)}</div></div><p class="result-note">Scores transcribed from the manuscript’s real-world results table. S-Lift is a combined score, not a binary success rate.</p></div></section>
+   <section class="wrap section gallery"><div class="section-heading"><div><p class="eyebrow">A CLOSER LOOK</p><h2>From simulated stress<br/>to everyday objects.</h2></div><p>Figures from the paper.<br/>Select an image to see it in full.</p></div><div class="figure-grid">{figures.map(f=><figure><a class="figure-link" href={asset(`figures/${f.file}`)} aria-label={`Open figure: ${f.label}`}><img src={asset(`figures/${f.file}`)} alt={f.text} loading="lazy"/></a><figcaption><p class="eyebrow">{f.tag}</p><h3>{f.label}</h3><p>{f.text}</p></figcaption></figure>)}</div><details><summary>Additional stress visualization and original figure files <span>+</span></summary><a class="figure-link extra" href={asset('figures/stress-detail.png')}><img src={asset('figures/stress-detail.png')} alt="Additional finite-element stress visualization from the project assets" loading="lazy"/></a><div class="downloads">{['FEM.pdf','FEM (1).pdf','Setup.pdf','Training Set.pdf','Eval objects.pdf'].map(file=><a href={asset(`figures/${encodeURIComponent(file)}`)}>{file} ↗</a>)}</div></details></section>
+   <section class="wrap closing"><p class="eyebrow">EXPLORE THE RESEARCH</p><h2>A little less stress.<br/>A lot more possibility.</h2><a class="button" href={asset('paper/stressless.pdf')}>Read the manuscript ↗</a><a class="text-link" href="mailto:yifeid@kth.se">Get in touch ↗</a></section>
+  </main>
+  <footer class="wrap"><span>StressLess · KTH / IRI, CSIC–UPC / Stanford</span><a href="https://github.com/RomanHauksson/academic-project-astro-template">Academic project template inspiration ↗</a></footer>
+  <script>
+   const video = document.querySelector<HTMLVideoElement>('#hero-video');
+   const toggle = document.querySelector<HTMLButtonElement>('#full-video');
+   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+   if (video && !reduceMotion.matches) video.play().catch(() => {});
+   toggle?.addEventListener('click', () => { if (!video) return; const full = toggle.dataset.mode !== 'full'; video.src = full ? toggle.dataset.full! : toggle.dataset.short!; video.loop = !full; toggle.dataset.mode = full ? 'full' : 'short'; toggle.textContent = full ? 'Back to highlights ↗' : 'Watch full video ↗'; const time = document.querySelector('.video-time'); if(time) time.textContent = full ? '01:30' : '00:32'; video.play().catch(() => {}); });
+  </script>
+ </body>
+</html>
